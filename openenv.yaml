@@ -1,0 +1,97 @@
+name: data-quality-env
+version: "1.0.0"
+description: >
+  OpenEnv environment for training and evaluating AI agents on real-world
+  data quality tasks: cleaning nulls/duplicates, normalising formats, and
+  reconciling related tables with FK and business-rule constraints.
+author: openenv-submission
+tags:
+  - data-quality
+  - data-cleaning
+  - real-world
+  - openenv
+
+# ── tasks ─────────────────────────────────────────────────────────────────────
+tasks:
+  - id: clean_nulls
+    name: "Clean Nulls and Duplicates"
+    difficulty: easy
+    description: >
+      Fix null values in required columns and remove duplicate rows from
+      a customer records dataset (10 rows, 8 initial issues).
+    max_steps: 15
+    reward_range: [0.0, 1.0]
+
+  - id: normalize_formats
+    name: "Normalize Data Formats"
+    difficulty: medium
+    description: >
+      Standardise inconsistent date (YYYY-MM-DD), amount (plain decimal),
+      and phone (E164) formats across a 7-row transactions dataset (18 issues).
+    max_steps: 20
+    reward_range: [0.0, 1.0]
+
+  - id: reconcile_tables
+    name: "Reconcile Related Tables"
+    difficulty: hard
+    description: >
+      Identify and fix FK violations, credit-limit overruns, non-positive
+      amounts, and impossible delivery dates in a 10-row orders table
+      (7 invalid orders across 4 violation types).
+    max_steps: 20
+    reward_range: [0.0, 1.0]
+
+# ── action space ──────────────────────────────────────────────────────────────
+action_space:
+  type: object
+  description: "Structured data-quality operation"
+  properties:
+    operation:
+      type: string
+      enum: [fill_null, drop_duplicates, normalize_column, set_value, delete_row, submit]
+      description: "Operation to perform"
+    column:
+      type: string
+      nullable: true
+      description: "Target column (fill_null, normalize_column, set_value)"
+    row_id:
+      type: integer
+      nullable: true
+      description: "Row id to target (set_value, delete_row)"
+    value:
+      nullable: true
+      description: "Value to write (set_value)"
+    strategy:
+      type: string
+      nullable: true
+      description: "fill_null strategy: mean | median | mode | <constant>"
+    subset:
+      type: array
+      items:
+        type: string
+      nullable: true
+      description: "Columns to check for duplicates (drop_duplicates)"
+
+# ── observation space ─────────────────────────────────────────────────────────
+observation_space:
+  type: object
+  description: "Current dataset state plus task context"
+  properties:
+    task_id:          {type: string}
+    task_description: {type: string}
+    data:             {type: array, items: {type: object}}
+    schema_info:      {type: object}
+    constraints:      {type: array, items: {type: string}}
+    issues_found:     {type: array, items: {type: string}}
+    issues_remaining: {type: integer}
+    step_count:       {type: integer}
+    max_steps:        {type: integer}
+    available_actions:{type: array, items: {type: string}}
+
+# ── endpoints ─────────────────────────────────────────────────────────────────
+endpoints:
+  reset: "POST /reset"
+  step:  "POST /step"
+  state: "GET  /state"
+
+port: 7860
