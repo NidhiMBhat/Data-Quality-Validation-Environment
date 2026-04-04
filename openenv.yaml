@@ -4,6 +4,7 @@ description: >
   OpenEnv environment for training and evaluating AI agents on real-world
   data quality tasks: cleaning nulls/duplicates, normalising formats, and
   reconciling related tables with FK and business-rule constraints.
+entry_point: src.environment:DataQualityEnvironment
 author: openenv-submission
 tags:
   - data-quality
