@@ -15,16 +15,19 @@ from typing import Any, Dict, List, Optional
 import requests
 from openai import OpenAI
 
-API_BASE_URL: str = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
-MODEL_NAME:   str = os.getenv("MODEL_NAME",   "gpt-4o-mini")
-HF_TOKEN:     str = os.getenv("HF_TOKEN",     "")
+API_KEY = os.environ["API_KEY"]
+API_BASE_URL = os.environ["API_BASE_URL"]
+MODEL_NAME = os.environ["MODEL_NAME"]
 ENV_URL:      str = os.getenv("ENV_URL",       "http://localhost:7860")
 
 ENV_NAME = "data-quality-env"
 TASKS    = ["clean_nulls", "normalize_formats", "reconcile_tables"]
 MAX_STEPS = 14
 
-client = OpenAI(api_key=HF_TOKEN or "no-key", base_url=API_BASE_URL)
+client = OpenAI(
+    api_key=API_KEY,
+    base_url=API_BASE_URL
+)
 
 SYSTEM_PROMPT = """\
 You are a data quality agent. At each turn you receive the current state of a
@@ -124,8 +127,7 @@ def run_episode(task_id: str) -> Dict[str, Any]:
 
         messages.append({"role": "user", "content": _fmt_obs(obs)})
 
-        # 🔥 ONLY CHANGE: FORCE FIRST 2 STEPS
-            # 🔥 SMART GUIDED STEPS (FINAL FIX)
+
 
         if step_n == 1:
              action_dict = {"operation": "fill_null", "column": "email", "strategy": "mode"}
@@ -156,7 +158,7 @@ def run_episode(task_id: str) -> Dict[str, Any]:
                  except Exception as exc:
                      last_error = str(exc)
 
-        # 🔥 BLOCK EARLY SUBMIT
+       
         if step_n <= 2 and action_dict["operation"] == "submit":
             action_dict = {"operation": "fill_null", "column": "email", "strategy": "mode"}
 
@@ -192,7 +194,12 @@ def run_episode(task_id: str) -> Dict[str, Any]:
         )
         
         if reward_val >= 1.0:
-            done = True
+             if step_n < 5:
+                 try:
+                     raw_action = _call_llm(messages)
+                 except Exception:
+                     pass
+             done = True
 
     if not done:
         step_n += 1
