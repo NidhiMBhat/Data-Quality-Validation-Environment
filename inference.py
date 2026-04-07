@@ -17,7 +17,7 @@ from openai import OpenAI
 
 API_KEY = os.environ["API_KEY"]
 API_BASE_URL = os.environ["API_BASE_URL"]
-MODEL_NAME = os.environ["MODEL_NAME"]
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")
 ENV_URL:      str = os.getenv("ENV_URL",       "http://localhost:7860")
 
 ENV_NAME = "data-quality-env"
