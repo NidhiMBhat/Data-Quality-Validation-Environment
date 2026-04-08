@@ -73,6 +73,11 @@ TASKS: Dict[str, Dict[str, Any]] = {
 }
 
 
+def _clamp(score: float) -> float:
+    """Return score strictly inside (0.0, 1.0) as the validator requires."""
+    return max(0.001, min(0.999, score))
+
+
 class DataQualityEnvironment:
     """
     OpenEnv-compliant environment for real-world data quality tasks.
@@ -117,7 +122,7 @@ class DataQualityEnvironment:
         if self.done:
             obs = self._make_observation()
             reward = Reward(
-                score=self.current_score,
+                score=_clamp(self.current_score),
                 issues_fixed_this_step=0,
                 total_issues_fixed=self._issues_fixed_count(),
                 issues_remaining=len(self._get_issues()),
@@ -133,15 +138,7 @@ class DataQualityEnvironment:
         if error:
             info["error"] = error
 
-        raw_score = self._cfg["grade"](self.data)
-
-# Clamp score into (0,1)
-        if raw_score <= 0.0:
-             new_score = 0.01
-        elif raw_score >= 1.0:
-             new_score = 0.99
-        else:
-             new_score = raw_score
+        new_score = _clamp(self._cfg["grade"](self.data))
 
         self.current_score = new_score
 
