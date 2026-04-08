@@ -78,7 +78,8 @@ TASK1_INITIAL_ISSUES: int = len(_task1_get_issues(TASK1_INITIAL_DATA))  # 8
 
 def grade_task1(data: List[Dict]) -> float:
     current = len(_task1_get_issues(data))
-    return round(max(0.0, 1.0 - current / TASK1_INITIAL_ISSUES), 4)
+    raw = max(0.0, 1.0 - current / TASK1_INITIAL_ISSUES)
+    return round(max(0.001, min(0.999, raw)), 4)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -147,7 +148,8 @@ TASK2_INITIAL_ISSUES: int = len(_task2_get_issues(TASK2_INITIAL_DATA))  # 18
 
 def grade_task2(data: List[Dict]) -> float:
     current = len(_task2_get_issues(data))
-    return round(max(0.0, 1.0 - current / TASK2_INITIAL_ISSUES), 4)
+    raw = max(0.0, 1.0 - current / TASK2_INITIAL_ISSUES)
+    return round(max(0.001, min(0.999, raw)), 4)
 
 
 # ── normalisation helpers used by the environment ────────────────────────────
@@ -302,4 +304,5 @@ TASK3_INITIAL_INVALID: int = len(_task3_get_invalid_order_ids(TASK3_INITIAL_DATA
 def grade_task3(data: List[Dict], customers: List[Dict] = TASK3_CUSTOMERS) -> float:
     current_invalid = len(_task3_get_invalid_order_ids(data, customers))
     fixed = max(0, TASK3_INITIAL_INVALID - current_invalid)
-    return round(fixed / TASK3_INITIAL_INVALID, 4)
+    raw = fixed / TASK3_INITIAL_INVALID
+    return round(max(0.001, min(0.999, raw)), 4)
