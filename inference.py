@@ -204,13 +204,13 @@ def run_episode(task_id: str) -> Dict[str, Any]:
                 f"{ENV_URL}/step", json={"operation": "submit"}, timeout=10
             )
             result     = resp.json()
-           raw_reward = float(result["reward"]["score"])
-           if raw_reward <= 0.0:
-                reward_val = 0.01
-           elif raw_reward >= 1.0:
-                reward_val = 0.99
-           else:
-                reward_val = raw_reward
+            raw_reward = float(result["reward"]["score"])
+            if raw_reward <= 0.0:
+                 reward_val = 0.01
+            elif raw_reward >= 1.0:
+                 reward_val = 0.99
+            else:
+                 reward_val = raw_reward
         except Exception:
            raw_reward = step_rewards[-1] if step_rewards else 0.0
 
