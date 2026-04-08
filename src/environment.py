@@ -133,7 +133,16 @@ class DataQualityEnvironment:
         if error:
             info["error"] = error
 
-        new_score = self._cfg["grade"](self.data)
+        raw_score = self._cfg["grade"](self.data)
+
+# Clamp score into (0,1)
+        if raw_score <= 0.0:
+             new_score = 0.01
+        elif raw_score >= 1.0:
+             new_score = 0.99
+        else:
+             new_score = raw_score
+
         self.current_score = new_score
 
         issues       = self._get_issues()
