@@ -243,9 +243,9 @@ def run_episode(task_id: str) -> Dict[str, Any]:
     success_str   = "true" if final_success else "false"
 
     print(
-        f"[END] success={success_str} steps={step_n} rewards={rewards_str}",
-        flush=True,
-    )
+    f"[END] success={success_str} steps={step_n} score={final_score:.3f} rewards={rewards_str}",
+    flush=True,
+)
 
     return {
         "task":        task_id,
