@@ -214,8 +214,18 @@ def run_episode(task_id: str) -> Dict[str, Any]:
             flush=True,
         )
 
-    final_score   = step_rewards[-1] if step_rewards else 0.0
-    final_success = final_score >= 1.0
+    raw_score = step_rewards[-1] if step_rewards else 0.0
+
+# Clamp score into (0,1)
+    if raw_score <= 0.0:
+        final_score = 0.01
+    elif raw_score >= 1.0:
+        final_score = 0.99
+    else:
+        final_score = raw_score
+
+# success should depend on raw score
+    final_success = raw_score >= 1.0
     rewards_str   = ",".join(f"{r:.2f}" for r in step_rewards)
     success_str   = "true" if final_success else "false"
 
