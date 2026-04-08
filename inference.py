@@ -204,9 +204,22 @@ def run_episode(task_id: str) -> Dict[str, Any]:
                 f"{ENV_URL}/step", json={"operation": "submit"}, timeout=10
             )
             result     = resp.json()
-            reward_val = float(result["reward"]["score"])
+           raw_reward = float(result["reward"]["score"])
+           if raw_reward <= 0.0:
+                reward_val = 0.01
+           elif raw_reward >= 1.0:
+                reward_val = 0.99
+           else:
+                reward_val = raw_reward
         except Exception:
-            reward_val = step_rewards[-1] if step_rewards else 0.0
+           raw_reward = step_rewards[-1] if step_rewards else 0.0
+
+           if raw_reward <= 0.0:
+                reward_val = 0.01
+           elif raw_reward >= 1.0:
+                reward_val = 0.99
+           else:
+                reward_val = raw_reward
         step_rewards.append(reward_val)
         print(
             f'[STEP] step={step_n} action={{"operation":"submit"}} '
@@ -242,7 +255,10 @@ def run_episode(task_id: str) -> Dict[str, Any]:
     }
 
 def main() -> None:
-    print(f"# Waiting for environment server at {ENV_URL} …", flush=True)
+    print(
+    f"[END] success={success_str} steps={step_n} score={final_score:.3f} rewards={rewards_str}",
+    flush=True,
+)
     _wait_for_server()
 
     results: List[Dict] = []
