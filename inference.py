@@ -134,26 +134,22 @@ def run_episode(task_id: str) -> Dict[str, Any]:
              raw_action = json.dumps(action_dict)
 
         elif step_n == 2:
+    # second safe step
              action_dict = {"operation": "drop_duplicates", "subset": ["name", "email"]}
              raw_action = json.dumps(action_dict)
 
-        elif step_n == 3:
-             action_dict = {"operation": "fill_null", "column": "age", "strategy": "median"}
-             raw_action = json.dumps(action_dict)
-
-        elif step_n == 4:
-             action_dict = {"operation": "fill_null", "column": "city", "strategy": "mode"}
-             raw_action = json.dumps(action_dict)
         else:
-    # normal LLM
-             action_dict = {"operation": "submit"}
+   
              raw_action = ""
-
+             action_dict = {"operation": "submit"}
+       
+    # normal LLM
+             
              for _ in range(2):
                  try:
                      raw_action = _call_llm(messages)
                      action_dict = safe_parse_action(raw_action)
-                     if action_dict["operation"] != "submit":
+                     if action_dict["operation"] != "submit" or obs["issues_remaining"] == 0:
                          break
                  except Exception as exc:
                      last_error = str(exc)
