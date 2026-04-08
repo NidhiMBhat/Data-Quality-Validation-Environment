@@ -255,10 +255,7 @@ def run_episode(task_id: str) -> Dict[str, Any]:
     }
 
 def main() -> None:
-    print(
-    f"[END] success={success_str} steps={step_n} score={final_score:.3f} rewards={rewards_str}",
-    flush=True,
-)
+   
     _wait_for_server()
 
     results: List[Dict] = []
